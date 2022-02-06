@@ -1,16 +1,38 @@
 import { StatusBar } from "expo-status-bar";
-import { StyleSheet, Text, View, TextInput, Button, FlatList } from "react-native";
+import {
+  StyleSheet,
+  Text,
+  View,
+  TextInput,
+  Button,
+  FlatList,
+} from "react-native";
 import { Header } from "./components/Header";
 import { useState } from "react";
+import { ListItem } from "./components/ListItem";
 
 export default function App() {
+  type Task = {
+    key: number;
+    task: String;
+    done: Boolean;
+  };
 
   const [task, setTask] = useState("");
-  const [taskList,setTaskList] =useState([{key:"teste"}])
+  const [taskList, setTaskList] = useState([]);
   // let taskList = [{key:"teste"}]
   const newTask = () => {
-    setTaskList(oldList => [...oldList,{key:task}])
-    setTask("")
+    let tasked: Task = {
+      task: task,
+      done: false,
+      key: taskList.length,
+    };
+    setTaskList((oldList) => [...oldList, tasked]);
+    setTask("");
+  };
+  const onSwipe = (item) => {
+    console.log("foii", item);
+    setTaskList((oldList) => oldList.filter((a) => a != item));
   };
   return (
     <View style={styles.container}>
@@ -19,8 +41,10 @@ export default function App() {
       <View style={styles.list}>
         {/* <Text>{task}</Text> */}
         <FlatList
-        data={taskList}
-        renderItem={({item}) => <Text>{item.key}</Text>}
+          data={taskList}
+          renderItem={({ item }) => (
+            <ListItem func={() => onSwipe(item)} text={item.task}></ListItem>
+          )}
         />
       </View>
       <View style={styles.insertField}>
@@ -33,13 +57,15 @@ export default function App() {
         </View>
         <Button title="Teste" onPress={newTask} />
       </View>
-    </View> 
+    </View>
   );
 }
 
 const styles = StyleSheet.create({
-  list:{
-    height:200,
+  list: {
+    height: 200,
+    width: "100%",
+    display: "flex",
   },
   container: {
     flex: 1,
